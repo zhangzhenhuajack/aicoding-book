@@ -39,7 +39,7 @@ services → repositories → db
 
 - `migrations/` 里涉及 `DROP COLUMN` / `DROP TABLE` / `ALTER COLUMN` 改类型的属于破坏性变更：必须停下来、在 PR 描述说明影响并请人确认，不要自行执行。
 - 每个迁移必须同时提供可用的 `upgrade` 和 `downgrade`。`downgrade` 不许是空的 `pass`。
-- 破坏性变更走 expand-contract 两阶段（见第 34 章），PR 需说明属于 expand 还是 contract 阶段。
+- 破坏性变更走 expand-contract 两阶段（见第 23 章），PR 需说明属于 expand 还是 contract 阶段。
 
 ## 代码风格
 
