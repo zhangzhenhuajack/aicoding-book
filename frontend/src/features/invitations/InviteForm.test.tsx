@@ -22,7 +22,7 @@ describe("InviteForm", () => {
           expires_at: "x",
           created_at: "y",
           accepted_at: null,
-          token: "one-time-token-xyz",
+          token: "e2e-one-time-token",
         }),
       } as Response),
     );
@@ -32,7 +32,7 @@ describe("InviteForm", () => {
     await userEvent.click(screen.getByRole("button", { name: "发送邀请" }));
 
     await waitFor(() =>
-      expect(screen.getByText("one-time-token-xyz")).toBeInTheDocument(),
+      expect(screen.getByText("e2e-one-time-token")).toBeInTheDocument(),
     );
   });
 
