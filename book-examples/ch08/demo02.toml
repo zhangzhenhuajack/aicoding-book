@@ -1,0 +1,26 @@
+# ~/.codex/config.toml —— 本书示例
+
+# 两个正交旋钮：沙箱（能做什么）与审批（什么时候问）
+sandbox_mode   = "workspace-write"   # read-only | workspace-write | danger-full-access
+approval_policy = "on-request"       # on-request | never（untrusted 预设已下线）
+
+# 可选加固：禁止 shell 工具走登录 shell
+allow_login_shell = false
+
+# 默认关网；只有显式打开 workspace-write 的网络，命令才可能联网
+[sandbox_workspace_write]
+network_access = false
+
+# 把常用预设存成 profile，用 `codex --profile ci-readonly` 选用
+# （profile 也可单独放到 ~/.codex/ci_readonly.config.toml）
+[profiles.ci-readonly]
+sandbox_mode    = "read-only"
+approval_policy = "never"
+
+# 对某个仓库强制"命令需逐一批准"的严格语义：
+# 用项目级 trust_level 代替已下线的 untrusted 预设
+[projects."/home/me/payments-service"]
+trust_level = "untrusted"
+
+# 把需要批准的动作交给自动审查代理（而非每次弹给人）——见 8.5
+approvals_reviewer = "auto_review"

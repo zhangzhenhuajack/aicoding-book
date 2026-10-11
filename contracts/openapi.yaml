@@ -1,0 +1,225 @@
+openapi: 3.1.0
+info:
+  title: TeamPulse Invitations API
+  version: 1.0.0
+  description: >
+    多租户团队协作看板的租户邀请功能契约。认证为演示简化：请求头
+    X-Demo-User: <email> 模拟登录（生产须换成 OIDC/JWT）。
+servers:
+  - url: /
+paths:
+  /api/tenants/{tenant_id}/invitations:
+    post:
+      operationId: createInvitation
+      summary: 创建邀请（返回一次性明文 token）
+      parameters:
+        - $ref: "#/components/parameters/TenantId"
+        - $ref: "#/components/parameters/DemoUser"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/InvitationCreate"
+      responses:
+        "201":
+          description: 已创建
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InvitationCreated"
+        "403":
+          $ref: "#/components/responses/Error"
+        "404":
+          $ref: "#/components/responses/Error"
+        "409":
+          $ref: "#/components/responses/Error"
+    get:
+      operationId: listInvitations
+      summary: 列出邀请（不返回 token / token_hash）
+      parameters:
+        - $ref: "#/components/parameters/TenantId"
+        - $ref: "#/components/parameters/DemoUser"
+        - name: status
+          in: query
+          required: false
+          schema:
+            $ref: "#/components/schemas/InvitationStatus"
+      responses:
+        "200":
+          description: 邀请列表
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Invitation"
+        "404":
+          $ref: "#/components/responses/Error"
+  /api/tenants/{tenant_id}/invitations/{invitation_id}/revoke:
+    post:
+      operationId: revokeInvitation
+      summary: 撤销 pending 邀请
+      parameters:
+        - $ref: "#/components/parameters/TenantId"
+        - $ref: "#/components/parameters/DemoUser"
+        - name: invitation_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: 已撤销
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Invitation"
+        "403":
+          $ref: "#/components/responses/Error"
+        "404":
+          $ref: "#/components/responses/Error"
+        "409":
+          $ref: "#/components/responses/Error"
+  /api/invitations/accept:
+    post:
+      operationId: acceptInvitation
+      summary: 接受邀请
+      parameters:
+        - $ref: "#/components/parameters/DemoUser"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AcceptRequest"
+      responses:
+        "200":
+          description: 已接受（幂等）
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AcceptResult"
+        "403":
+          $ref: "#/components/responses/Error"
+        "404":
+          $ref: "#/components/responses/Error"
+        "410":
+          $ref: "#/components/responses/Error"
+components:
+  parameters:
+    TenantId:
+      name: tenant_id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    DemoUser:
+      name: X-Demo-User
+      in: header
+      required: true
+      schema:
+        type: string
+        format: email
+  responses:
+    Error:
+      description: 统一错误体
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorEnvelope"
+  schemas:
+    Role:
+      type: string
+      enum: [admin, member]
+    InvitationStatus:
+      type: string
+      enum: [pending, accepted, revoked, expired]
+    InvitationCreate:
+      type: object
+      required: [email, role]
+      additionalProperties: false
+      properties:
+        email:
+          type: string
+          format: email
+        role:
+          $ref: "#/components/schemas/Role"
+    Invitation:
+      type: object
+      required: [id, tenant_id, email, role, status, expires_at, created_at]
+      properties:
+        id:
+          type: string
+          format: uuid
+        tenant_id:
+          type: string
+          format: uuid
+        email:
+          type: string
+          format: email
+        role:
+          $ref: "#/components/schemas/Role"
+        status:
+          $ref: "#/components/schemas/InvitationStatus"
+        expires_at:
+          type: string
+          format: date-time
+        created_at:
+          type: string
+          format: date-time
+        accepted_at:
+          type: [string, "null"]
+          format: date-time
+    InvitationCreated:
+      allOf:
+        - $ref: "#/components/schemas/Invitation"
+        - type: object
+          required: [token]
+          properties:
+            token:
+              type: string
+              description: 一次性明文 token，仅此响应返回一次，服务端只存哈希。
+    AcceptRequest:
+      type: object
+      required: [token]
+      additionalProperties: false
+      properties:
+        token:
+          type: string
+    AcceptResult:
+      type: object
+      required: [tenant_id, user_email, role, status]
+      properties:
+        tenant_id:
+          type: string
+          format: uuid
+        user_email:
+          type: string
+          format: email
+        role:
+          $ref: "#/components/schemas/Role"
+        status:
+          $ref: "#/components/schemas/InvitationStatus"
+    ErrorEnvelope:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: object
+          required: [code, message]
+          properties:
+            code:
+              type: string
+              enum:
+                - INVITATION_ALREADY_PENDING
+                - ALREADY_MEMBER
+                - INVITATION_EXPIRED
+                - EMAIL_MISMATCH
+                - INVITATION_NOT_PENDING
+                - INVITATION_NOT_FOUND
+                - FORBIDDEN
+            message:
+              type: string

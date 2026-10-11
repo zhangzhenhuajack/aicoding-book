@@ -1,0 +1,89 @@
+# 本书示例（第 19 章 Demo 19-1）：加固过的 agent 流水线
+# 形状：AI 只读生成 -> 结构化输出校验 -> 独立写作业开 PR
+# 加固点：读写分离双 job / OIDC 短期凭证 / permissions 最小化 /
+#         并发取消 / 双层超时 / 防 fork 烧钱 / 输出 schema 校验门
+name: Agent assisted fix
+on:
+  workflow_run:
+    workflows: ["CI"]
+    types: [completed]
+
+# 并发：同一来源的新事件取消旧运行，不浪费 token
+concurrency:
+  group: agent-fix-${{ github.event.workflow_run.head_branch }}
+  cancel-in-progress: true
+
+# 顶层默认最小权限：什么都不给，各 job 按需显式申请
+permissions: {}
+
+jobs:
+  generate_fix:
+    # 只在本仓库自身的 CI 失败时跑：防 fork 触发烧钱
+    if: >-
+      github.repository == 'teampulse/teampulse'
+      && github.event.workflow_run.conclusion == 'failure'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15          # 外层：整个 job 的硬上限
+    permissions:
+      contents: read             # AI 阶段只读
+      id-token: write            # 用于 OIDC 换短期 token，不落静态 key
+    outputs:
+      verdict: ${{ steps.verify.outputs.verdict }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+          persist-credentials: false   # 不把凭证留在工作区
+      - name: Run agent (read-only sandbox)
+        timeout-minutes: 8             # 内层：agent 这一步的上限
+        env:
+          # 不设 job 级 API key；此处仅演示注入到单一受信步骤
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          # 真实项目用 openai/codex-action 或 anthropics/claude-code-action，
+          # 并用 --output-schema 强制结构化 JSON。此处用占位产出演示下游校验。
+          cat > agent_out.json <<'JSON'
+          {"labels": ["bug"], "reason": "null deref in auth path"}
+          JSON
+      - name: Verify agent output (schema + injection gate)
+        id: verify
+        run: |
+          if python3 verify_agent_output.py "$(cat agent_out.json)"; then
+            echo "verdict=pass" >> "$GITHUB_OUTPUT"
+          else
+            echo "verdict=blocked" >> "$GITHUB_OUTPUT"
+            exit 1
+          fi
+      - uses: actions/upload-artifact@v4
+        with:
+          name: agent-output
+          path: agent_out.json
+          if-no-files-found: error
+
+  open_pr:
+    needs: generate_fix
+    if: needs.generate_fix.outputs.verdict == 'pass'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write            # 写权限在独立 job，且不碰 API key
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+      - uses: actions/download-artifact@v4
+        with:
+          name: agent-output
+          # 不解包到工作区根：避免落下可执行脚本
+          path: ${{ runner.temp }}/agent
+      - name: Open pull request
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          branch="agent/fix-${{ github.event.workflow_run.run_id }}"
+          git switch -c "$branch"
+          git commit --allow-empty -m "Agent-assisted fix (see artifact)"
+          git push origin "$branch"
+          gh pr create --base "${{ github.event.workflow_run.head_branch }}" \
+            --head "$branch" --title "Agent-assisted fix" --body-file pr-body.md

@@ -1,0 +1,36 @@
+name: "CodeQL Security Scan"
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  schedule:
+    - cron: "0 3 * * 1"   # 每周一凌晨跑一次全量
+
+jobs:
+  analyze:
+    name: Analyze (${{ matrix.language }})
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write   # 关键：允许把告警写回 Security 面板
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [ "python" ]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: ${{ matrix.language }}
+          # queries: security-extended   # 想要更严可打开扩展规则集
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: "/language:${{ matrix.language }}"

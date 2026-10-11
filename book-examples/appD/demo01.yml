@@ -1,0 +1,60 @@
+name: Codex auto-fix on CI failure
+on:
+  workflow_run:
+    workflows: ["CI"]
+    types: [completed]
+
+jobs:
+  generate_fix:
+    if: ${{ github.event.workflow_run.conclusion == 'failure' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read                       # ← agent 阶段只读
+    outputs:
+      has_patch: ${{ steps.diff.outputs.has_patch }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+          persist-credentials: false       # ← 不把凭证留在工作区
+      - name: Run Codex
+        uses: openai/codex-action@v1
+        with:
+          openai-api-key: ${{ secrets.OPENAI_API_KEY }}
+          prompt: |
+            实现让测试通过的最小改动，不要重构无关文件。
+      - name: Create patch artifact
+        id: diff
+        run: |
+          git add -N .
+          git diff --binary HEAD > codex.patch
+          if [ -s codex.patch ]; then echo "has_patch=true" >> "$GITHUB_OUTPUT"; else echo "has_patch=false" >> "$GITHUB_OUTPUT"; fi
+      - uses: actions/upload-artifact@v4
+        if: steps.diff.outputs.has_patch == 'true'
+        with:
+          name: codex-fix-patch
+          path: codex.patch
+
+  open_pr:
+    runs-on: ubuntu-latest
+    needs: generate_fix
+    if: needs.generate_fix.outputs.has_patch == 'true'
+    permissions:
+      contents: write                      # ← 写权限在独立 job，且无 API key
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/download-artifact@v4
+        with:
+          name: codex-fix-patch
+      - name: Apply Codex patch
+        run: git apply --index codex.patch
+      - name: Open pull request
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          branch="codex/auto-fix-${{ github.event.workflow_run.run_id }}"
+          git switch -c "$branch"
+          git commit -am "Auto-fix failing CI via Codex"
+          git push origin "$branch"
+          gh pr create --title "Auto-fix failing CI via Codex" --body-file pr-body.md
