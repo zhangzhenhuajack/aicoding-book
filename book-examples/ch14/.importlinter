@@ -1,0 +1,10 @@
+[importlinter]
+root_package = shop
+
+[importlinter:contract:layers]
+name = Shop layers must not be violated
+type = layers
+layers =
+    shop.api
+    shop.service
+    shop.repo
