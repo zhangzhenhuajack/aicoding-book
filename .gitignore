@@ -103,8 +103,6 @@ ipython_config.py
 
 # poetry
 #   Similar to Pipfile.lock, it is generally recommended to include poetry.lock in version control.
-#   This is especially recommended for binary packages to ensure reproducibility, and is more
-#   commonly ignored for libraries.
 #   https://python-poetry.org/docs/basic-usage/#commit-your-poetrylock-file-to-version-control
 # poetry.lock
 # poetry.toml
@@ -218,3 +216,24 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# ---- TeamPulse 随书项目 ----
+# Python
+*.pyc
+.venv/
+.import_linter_cache/
+mutants/
+.mutmut-cache
+
+# Node / frontend
+node_modules/
+frontend/src/api/schema.d.ts
+playwright-report/
+test-results/
+
+# CDK
+infra/cdk.out/
+infra/dist/
+
+# OS
+.DS_Store

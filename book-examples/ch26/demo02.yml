@@ -1,0 +1,30 @@
+# deploy.yml（本书示例）：仅 push 到 main 时发布，用 OIDC 假设 AWS 角色
+name: Deploy
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+  id-token: write          # ← 必须，OIDC 签发令牌需要它；其余权限一律不给
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    # 用 GitHub Environment 做人工审批闸门（见 26.4）
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials (OIDC, 临时凭证)
+        uses: aws-actions/configure-aws-credentials@v6.3.0
+        with:
+          role-to-assume: arn:aws:iam::123456789012:role/teampulse-github-deploy
+          aws-region: us-east-1
+          role-session-name: gha-${{ github.run_id }}   # 审计日志里能对上是哪次运行
+
+      - name: CDK synth (只合成，不部署)
+        working-directory: infra
+        run: npx cdk synth
+
+      # 真实发布时在此 cdk deploy；本书全程只做 synth，不执行 deploy。

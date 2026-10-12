@@ -1,0 +1,36 @@
+name: AI Code Review
+on:
+  pull_request:
+    types: [opened, synchronize, ready_for_review, reopened]
+    # 路径分级：只有核心代码/契约改动才触发评审；纯文档改动不跑（省钱、降噪）
+    paths:
+      - "app/**"
+      - "contracts/**"
+      - "!**/*.md"
+
+# 最小权限：评审只读。没有 contents: write——这个工作流不改代码。
+permissions:
+  contents: read        # 读仓库文件（checkout diff）
+  pull-requests: read   # 读 PR 元数据
+  issues: read          # 读关联 issue 上下文
+  id-token: write       # claude-code-action 默认 GitHub App 鉴权所需
+
+jobs:
+  review:
+    # 草稿 PR 不评审，省钱
+    if: github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+    timeout-minutes: 15   # 防止 runaway 作业无限跑
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 1
+      - uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          plugin_marketplaces: "https://github.com/anthropics/claude-code.git"
+          plugins: "code-review@claude-code-plugins"
+          # --comment 让 Claude 把评审发到 PR（否则只写进运行日志）
+          prompt: "/code-review:code-review --comment ${{ github.repository }}/pull/${{ github.event.pull_request.number }}"
+          # 只开"发内联评论"这一个工具，不给 shell、不给写代码的工具
+          claude_args: '--allowedTools "mcp__github_inline_comment__create_inline_comment" --max-turns 8'

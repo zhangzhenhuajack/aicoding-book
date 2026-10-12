@@ -1,0 +1,99 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+      - name: Sync deps
+        run: uv sync --all-extras --dev
+      - name: Ruff lint
+        run: uv run ruff check .
+      - name: Ruff format check
+        run: uv run ruff format --check .
+      - name: Mypy strict
+        run: uv run mypy --strict app
+      - name: Import-linter (layering contract)
+        run: uv run lint-imports
+      - name: Unit / contract / architecture tests (SQLite)
+        run: uv run pytest -m "not integration" --cov=app --cov-report=term-missing
+
+  backend-integration:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: teampulse
+          POSTGRES_PASSWORD: teampulse
+          POSTGRES_DB: teampulse
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U teampulse"
+          --health-interval 2s --health-timeout 3s --health-retries 20
+    env:
+      TEAMPULSE_DATABASE_URL: postgresql+psycopg://teampulse:teampulse@localhost:5432/teampulse
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - run: uv sync --all-extras --dev
+      - name: Migration up/down/up (reversibility gate)
+        run: |
+          uv run alembic upgrade head
+          uv run alembic downgrade -1
+          uv run alembic upgrade head
+      - name: Integration tests (Postgres)
+        run: uv run pytest -m integration
+
+  frontend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: npm ci
+      - name: Type-check (tsc strict)
+        run: npm run typecheck
+      - name: Vitest
+        run: npm run test
+      - name: Build
+        run: npm run build
+
+  mutation-nightly:
+    # 变异测试太慢，不在 PR 阶段跑；夜间定时对后端增量跑。
+    if: github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - run: uv sync --all-extras --dev
+      - run: uv run mutmut run || true
+      - run: uv run mutmut results

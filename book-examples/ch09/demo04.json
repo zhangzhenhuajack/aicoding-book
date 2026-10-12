@@ -1,0 +1,16 @@
+{
+  "version": "v1",
+  "hooks": [
+    {
+      "name": "trace-tasks-to-requirements",
+      "description": "每次 tasks.md 被保存后，校验每条任务都追溯到需求编号",
+      "trigger": "PostFileSave",
+      "matcher": "specs/.*/tasks\\.md$",
+      "action": {
+        "type": "command",
+        "command": "python3 check_trace.py .kiro/specs/comment-soft-delete"
+      },
+      "timeout": 30
+    }
+  ]
+}

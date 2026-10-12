@@ -1,0 +1,21 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          { "type": "command", "command": "ruff format $CLAUDE_FILE_PATHS" },
+          { "type": "command", "command": "ruff check --fix $CLAUDE_FILE_PATHS" }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          { "type": "command", "command": "scripts/deny-dangerous-cmd.sh" }
+        ]
+      }
+    ]
+  }
+}
