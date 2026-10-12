@@ -1,4 +1,4 @@
-"""Demo 34-3：缓存命中模拟（本书示例）
+"""Demo 34-2：缓存命中模拟（本书示例）
 模拟官方回看机制（核验 2026-10-08）：写入只在断点处；读取只找先前写入的条目。
 来源：https://docs.claude.com/en/docs/build-with-claude/prompt-caching
 """

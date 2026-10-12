@@ -1,0 +1,16 @@
+{
+  "pr": "feat: 导出用户活跃报表",
+  "comments": [
+    {"severity": "P0", "title": "空列表时除零崩溃", "file": "report.py", "line": 12,
+     "evidence": "当 users 为空列表时 len(users)==0,触发 ZeroDivisionError,导出任务整体失败。",
+     "suggestion": "改为 active / len(users) if users else 0.0。"},
+    {"severity": "P1", "title": "同步阻塞调用破坏异步导出约定", "file": "report.py", "line": 20,
+     "evidence": "send_email 是同步 HTTP 调用,而本模块其余导出均通过 enqueue() 异步化。",
+     "suggestion": "改成 enqueue(send_email, report),与既有异步导出保持一致。"},
+    {"severity": "P2", "title": "是否值得为单一报表引入 pandas", "file": "report.py", "line": 3,
+     "evidence": "import pandas 仅用于一次 groupby,用 collections.Counter 即可完成。",
+     "suggestion": "建议删依赖,改用 collections.Counter;若预期后续有分析需求请记入 ADR。"},
+    {"severity": "严重", "title": "这里写得不太好", "file": null, "line": null,
+     "evidence": "感觉有问题", "suggestion": "优化一下"}
+  ]
+}
