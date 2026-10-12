@@ -1,0 +1,45 @@
+/* tokens.css —— 唯一颜色事实源；深浅两套成对定义（与第 24.2 节约定一致） */
+:root {
+  --color-bg-page: #f3f4f6;
+  --color-bg-surface: #ffffff;
+  --color-border-surface: #e5e7eb;
+  --color-border-input: #d1d5db;
+  --color-divider: #f0f0f0;
+  --color-text-primary: #1f2937;
+  --color-text-muted: #6b7280;
+  --color-accent: #2563eb;
+  --color-accent-hover: #1d4ed8;
+  --color-accent-ring: rgba(37, 99, 235, 0.15);
+  --color-on-accent: #ffffff;
+  --color-ok-bg: #ecfdf5;
+  --color-ok-border: #10b981;
+  --color-ok-text: #065f46;
+  --color-ok-code-bg: rgba(16, 185, 129, 0.12);
+  --color-danger-bg: #fef2f2;
+  --color-danger-border: #ef4444;
+  --color-danger-border-soft: #fecaca;
+  --color-danger-text: #991b1b;
+  --shadow-surface: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+[data-theme="dark"] {
+  --color-bg-page: #0b0e14;
+  --color-bg-surface: #11151d;
+  --color-border-surface: #232a36;
+  --color-border-input: #374151;
+  --color-divider: #1f2632;
+  --color-text-primary: #e6e9ef;
+  --color-text-muted: #9ca3af;
+  --color-accent: #3b82f6;
+  --color-accent-hover: #60a5fa;
+  --color-accent-ring: rgba(59, 130, 246, 0.3);
+  --color-on-accent: #0b0e14;
+  --color-ok-bg: #052e22;
+  --color-ok-border: #10b981;
+  --color-ok-text: #a7f3d0;
+  --color-ok-code-bg: rgba(16, 185, 129, 0.2);
+  --color-danger-bg: #2a0f12;
+  --color-danger-border: #f87171;
+  --color-danger-border-soft: #7f1d1d;
+  --color-danger-text: #fecaca;
+  --shadow-surface: none;
+}

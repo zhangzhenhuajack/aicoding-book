@@ -1,0 +1,160 @@
+/* TeamPulse 邀请页样式：只按语义元素与 ARIA 属性选择，不改组件结构；颜色一律取自 tokens.css。 */
+@import "./tokens.css";
+
+:root {
+  font-family: -apple-system, "Segoe UI", "PingFang SC", "Noto Sans CJK SC", "Microsoft YaHei", sans-serif;
+  color: var(--color-text-primary);
+  line-height: 1.5;
+}
+
+* { box-sizing: border-box; }
+
+body { margin: 0; background: var(--color-bg-page); }
+
+#root { padding: 14px 16px; }
+
+main {
+  max-width: 560px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+h1 {
+  margin: 0 0 4px;
+  font-size: 22px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* 标题前的品牌色块 */
+h1::before {
+  content: "";
+  width: 10px;
+  height: 22px;
+  border-radius: 3px;
+  background: var(--color-accent);
+}
+
+h2 { margin: 0 0 8px; font-size: 16px; font-weight: 600; }
+
+/* 三块内容都用卡片承载 */
+form, section {
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border-surface);
+  border-radius: 10px;
+  padding: 12px 16px;
+  box-shadow: var(--shadow-surface);
+}
+
+form[aria-label="创建邀请"]::before,
+form[aria-label="接受邀请"]::before {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 16px;
+  font-weight: 600;
+}
+form[aria-label="创建邀请"]::before { content: "邀请新成员"; }
+form[aria-label="接受邀请"]::before { content: "接受邀请"; }
+
+/* 创建邀请：邮箱、角色两行字段 + 按钮 */
+form[aria-label="创建邀请"] > div {
+  display: grid;
+  grid-template-columns: 64px 1fr;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+/* 接受邀请：标签、输入框、按钮排成一行 */
+form[aria-label="接受邀请"] {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 12px;
+}
+form[aria-label="接受邀请"]::before { grid-column: 1 / -1; margin-bottom: 0; }
+form[aria-label="接受邀请"] > p { grid-column: 1 / -1; }
+
+label { font-size: 14px; color: var(--color-text-muted); }
+
+input, select {
+  width: 100%;
+  height: 32px;
+  padding: 0 10px;
+  font: inherit;
+  font-size: 14px;
+  color: var(--color-text-primary);
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border-input);
+  border-radius: 6px;
+}
+input:focus, select:focus {
+  outline: none;
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px var(--color-accent-ring);
+}
+
+button {
+  height: 32px;
+  padding: 0 16px;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-on-accent);
+  background: var(--color-accent);
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+button:hover { background: var(--color-accent-hover); }
+button:disabled { opacity: 0.6; cursor: not-allowed; }
+form[aria-label="创建邀请"] > button { margin-left: 76px; }
+
+/* 一次性 token 与错误提示 */
+p[role="status"], p[role="alert"] {
+  margin: 10px 0 0;
+  padding: 8px 12px;
+  font-size: 14px;
+  border-radius: 6px;
+  border-left: 4px solid;
+}
+p[role="status"] { background: var(--color-ok-bg); border-color: var(--color-ok-border); color: var(--color-ok-text); }
+p[role="alert"] { background: var(--color-danger-bg); border-color: var(--color-danger-border); color: var(--color-danger-text); }
+
+code {
+  font-family: "JetBrains Mono", "SFMono-Regular", Consolas, monospace;
+  font-size: 13px;
+  padding: 2px 6px;
+  background: var(--color-ok-code-bg);
+  border-radius: 4px;
+}
+
+/* 待处理邀请列表 */
+section > p { margin: 0; color: var(--color-text-muted); font-size: 14px; }
+ul { list-style: none; margin: 0; padding: 0; }
+li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 0;
+  font-size: 14px;
+  border-top: 1px solid var(--color-divider);
+}
+li:first-child { border-top: none; padding-top: 0; }
+li:last-child { padding-bottom: 0; }
+li button {
+  height: 30px;
+  padding: 0 12px;
+  font-size: 13px;
+  color: var(--color-danger-text);
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-danger-border-soft);
+}
+li button:hover { background: var(--color-danger-bg); }
+
+/* 卡片已经分隔开，原分隔线不再需要 */
+hr { display: none; }
