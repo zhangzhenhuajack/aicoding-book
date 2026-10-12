@@ -1,0 +1,10 @@
+[
+  {"code": "F401", "message": "`os` imported but unused", "filename": "app/invites.py",
+   "location": {"row": 15, "column": 8}, "fix": {"applicability": "safe"}},
+  {"code": "F541", "message": "f-string without any placeholders", "filename": "app/invites.py",
+   "location": {"row": 103, "column": 12}, "fix": {"applicability": "safe"}},
+  {"code": "E711", "message": "Comparison to `None` should be `cond is None`",
+   "filename": "app/invites.py", "location": {"row": 67, "column": 8}, "fix": null},
+  {"code": "B008", "message": "Do not perform function call `datetime.now` in argument defaults",
+   "filename": "app/invites.py", "location": {"row": 29, "column": 25}, "fix": null}
+]
