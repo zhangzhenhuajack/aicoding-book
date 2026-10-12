@@ -1,0 +1,3 @@
+# ruff.toml —— 选中 F（含未用导入 F401）和 RET（含多余 else RET505）两组规则
+[lint]
+select = ["F", "RET"]

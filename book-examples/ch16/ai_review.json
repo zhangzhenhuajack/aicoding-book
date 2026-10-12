@@ -1,0 +1,10 @@
+[
+  {"path": "app/invites.py", "line": 42, "severity": "P1", "category": "logic",
+   "message": "重复邀请未去重：并发两次 POST /invites 会创建两条记录。", "source": "ai"},
+  {"path": "app/invites.py", "line": 88, "severity": "P1", "category": "security",
+   "message": "跨租户越权：accept_invite 未校验 invite.tenant_id 与当前用户一致。", "source": "ai"},
+  {"path": "app/invites.py", "line": 15, "severity": "P2", "category": "style",
+   "message": "导入了 os 但未使用。", "source": "ai"},
+  {"path": "app/invites.py", "line": 103, "severity": "P2", "category": "style",
+   "message": "f-string 没有占位符。", "source": "ai"}
+]
