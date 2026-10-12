@@ -1,0 +1,17 @@
+# 项目约定单一事实源（与厂商无关）
+project: TeamPulse
+summary: 多租户团队协作后端，核心是租户隔离与邀请流程。
+commands:
+  - 构建：uv run python -m teampulse build
+  - 测试：pytest -q
+  - 结构测试：pytest tests/arch -q
+constraints:
+  - 前端不得直接调用后端内部接口（由 tests/arch 结构测试强制）
+  - 类型检查 strict，禁用 any 逃生舱
+  - 禁止提交密钥，pre-commit 做密钥扫描
+limits:
+  max_pr_lines: 400
+  max_file_lines: 500
+permissions:
+  - 默认关网，仅 allowlist 域名可访问
+  - 生产环境只读诊断，写操作需人工审批
