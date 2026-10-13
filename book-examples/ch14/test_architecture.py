@@ -3,7 +3,7 @@
 import ast
 from pathlib import Path
 
-PKG = Path(__file__).resolve().parent.parent / "shop"
+PKG = Path(__file__).resolve().parent / "shop"
 
 # 层级从高到低：序号越小越靠上层。规则：只能依赖同层或更下层（序号 >= 自己）。
 LAYERS = {"shop.api": 0, "shop.service": 1, "shop.repo": 2}
