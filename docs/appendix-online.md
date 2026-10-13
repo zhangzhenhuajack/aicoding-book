@@ -5,9 +5,9 @@
 
 ## 附录 A　范式与流派速查：关键事件时间线、能力对照与选型索引
 
-### A.4 本附录对应的仓库与官方入口（核验于 2026-10）
+### A.4 本附录对应的仓库与官方入口
 
-速查时常要直接跳到一手仓库/文档，集中列此，全部经 `curl -L` 核验返回 200。
+速查时常要直接跳到一手仓库/文档，集中列此。
 
 | 流派 / 主题 | 一手仓库 / 文档 |
 |---|---|
@@ -189,7 +189,7 @@ bash -n scripts/rollback.sh           # set -euo pipefail，语法 OK
 
 ### C.3 Hooks 与配置样例
 
-四类真实可照抄的配置，地址核验于 2026-10。
+四类真实可照抄的配置。
 
 ### C.3.1 pre-commit：提交前秒级门禁
 
@@ -253,7 +253,7 @@ run:
 安装：Codex CLI / codex-action
 仓库 [github.com/openai/codex](https://github.com/openai/codex)、CI 用 [codex-action](https://github.com/openai/codex-action)。非交互 `codex exec` 默认只读沙箱。
 
-把 Codex 接进 CI 的关键是**只读沙箱 + 权限档 + 结构化输出**（[openai/codex](https://github.com/openai/codex) 的 `issue-labeler.yml` 原文要点，核验于 2026-08）：
+把 Codex 接进 CI 的关键是**只读沙箱 + 权限档 + 结构化输出**（[openai/codex](https://github.com/openai/codex) 的 `issue-labeler.yml` 原文要点）：
 
 ```yaml
 - id: codex
@@ -264,7 +264,7 @@ run:
 
 三个加固点：`drop-sudo`（降权）、`read-only`（只读文件系统）、`output-schema`（强制 JSON）。**永远不要把 Agent 的输出直接拼进 shell 命令**——让它输出结构化数据，校验后再动作。
 
-### C.4 工具与官方地址索引（核验于 2026-10）
+### C.4 工具与官方地址索引
 
 取自真实仓库原文的片段已标核验日期（2026-08-24）；标【本书示例】的技术真实可复现但不声称来自生产仓库；Kiro hook 字段为示意结构。
 
@@ -287,7 +287,7 @@ run:
 
 ## 附录 D　安全交付检查清单：CI/CD 加固、发布审批与回滚
 
-### D.3 工具与官方地址索引（核验于 2026-10）
+### D.3 工具与官方地址索引
 
 | 用途 | 工具 / 文档 | 地址 |
 |---|---|---|
@@ -299,7 +299,7 @@ run:
 | 外部确定性策略兜底（动作允许/拒绝） | Open Policy Agent | [github.com/open-policy-agent/opa](https://github.com/open-policy-agent/opa) |
 
 标注说明
-Rule of Two、OIDC/读写分离/fork 禁令等均为厂商官方原话或仓库原文，核验于 2026-08-24；标【本书示例】的 YAML/脚本技术真实可复现但不声称来自生产；跨厂商漏洞（Comment and Control / PromptPwnd）为社区安全媒体来源。本附录无仍标【未证实】的事实性数字。
+Rule of Two、OIDC/读写分离/fork 禁令等均为厂商官方原话或仓库原文；标【本书示例】的 YAML/脚本技术真实可复现但不声称来自生产；跨厂商漏洞（Comment and Control / PromptPwnd）为社区安全媒体来源。本附录无仍标的事实性数字。
 
 ## 附录 E　团队改进工具：Token 优化清单、回顾会模板与度量看板
 
@@ -397,11 +397,11 @@ Rule of Two、OIDC/读写分离/fork 禁令等均为厂商官方原话或仓库�
 
 ## 附录 G　参考来源
 
-### G.1　分级来源索引（URL 已核实可访问）
+### G.1　主要来源索引
 
-下面汇总全书主要的一手与权威来源，按本书的四级可信度标注分组。所有 URL 均在 2026-10 用 web_fetch / curl（超时 15 秒）核实可访问（HTTP 200）；核实中打不开或被反爬拦截的候选见本节末尾说明。
+下面汇总全书主要的一手与权威来源，按主题分组。
 
-#### 【一手·官方】官方文档 / 官方工程博客 / 官方仓库
+#### 官方文档 / 官方工程博客 / 官方仓库
 
 1. Anthropic，“Prompt caching”（缓存三类 Token 口径、1.25×/2× 写入与 0.1× 读取倍数、最小可缓存长度、失效层级与断点反模式——第 34 章成本章的核心一手来源），[https://docs.claude.com/en/docs/build-with-claude/prompt-caching](https://docs.claude.com/en/docs/build-with-claude/prompt-caching)。
 2. Anthropic, “Building effective agents”（代理设计原则、生成-评判与反馈机制——第 7 章流派分析依据），[https://www.anthropic.com/engineering/building-effective-agents](https://www.anthropic.com/engineering/building-effective-agents)。
@@ -419,7 +419,7 @@ Rule of Two、OIDC/读写分离/fork 禁令等均为厂商官方原话或仓库�
 14. agents.md（AGENTS.md 约定的社区规范站——第 4、14 章），[https://agents.md/](https://agents.md/)。
 15. GitHub Copilot 官方页（代码补全与评审产品对照——第 16 章），[https://github.com/features/copilot](https://github.com/features/copilot)。
 
-#### 【一手·研究】论文与研究机构报告
+#### 论文与研究机构报告
 
 1. METR, “Measuring the Impact of Early-2025 AI on Experienced Open-Source Developer Productivity”（资深开发者高估 AI 加速——第 2 章“证据的时间边界”关键依据），[https://metr.org/blog/2025-07-10-early-2025-ai-experienced-os-dev-study/](https://metr.org/blog/2025-07-10-early-2025-ai-experienced-os-dev-study/)。
 2. Jimenez et al., “SWE-bench: Can Language Models Resolve Real-World GitHub Issues?”（arXiv:2310.06770，SWE-bench 原始论文——第 2 章），[https://arxiv.org/abs/2310.06770](https://arxiv.org/abs/2310.06770)。
@@ -427,10 +427,8 @@ Rule of Two、OIDC/读写分离/fork 禁令等均为厂商官方原话或仓库�
 4. Bavarian et al., “Efficient Training of Language Models to Fill in the Middle”（arXiv:2207.14255，FIM 代码补全——第 3 章 Prompt Engineering 技术背景），[https://arxiv.org/abs/2207.14255](https://arxiv.org/abs/2207.14255)。
 5. Kocetkov et al., “The Stack: 3 TB of permissively licensed source code”（arXiv:2211.15533，代码训练数据集——第 10 章开源生态背景），[https://arxiv.org/abs/2211.15533](https://arxiv.org/abs/2211.15533)。
 
-#### 【官方转述 / 社区】标准、框架与社区资源
+#### 标准、框架与社区资源
 
 1. DORA（DevOps Research and Assessment）官方站（交付周期/部署频率/变更失败率/恢复时间四指标定义——第 2、30 章），[https://dora.dev/](https://dora.dev/)。
 2. OWASP, “Top 10 for Large Language Model Applications”（提示注入等 LLM 应用风险清单——第 19 章安全治理），[https://genai.owasp.org/llm-top-10/](https://genai.owasp.org/llm-top-10/)。
 
-核实中被剔除/替换的 URL
-以下候选未写入正文：OpenAI 的 `openai.com/index/introducing-codex/` 等营销页在 curl 下返回 403（Cloudflare 反爬），虽经 web_fetch 确认页面真实存在，但为保证读者可直接打开，已改用返回 200 的官方技术文档 `platform.openai.com/docs/guides/prompt-caching` 替代；GitHub OIDC 文档的旧路径 `.../actions/security-guides/.../configuring-openid-connect-in-amazon-web-services` 返回 404，已更正为现行路径（见上）。关于 OpenAI 缓存折扣的三个相互冲突的第三方数字（50%/75%/90%）按引用纪律一律不采用。
