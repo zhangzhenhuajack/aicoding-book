@@ -8,9 +8,17 @@ permissions:
   contents: read
   id-token: write          # ← 必须，OIDC 签发令牌需要它；其余权限一律不给
 
+# 同一分支的发布串行执行，且不取消进行中的发布（避免半截部署被打断）
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
+    # 防 fork 仓库触发真实发布而烧钱
+    if: github.repository == 'zhangzhenhuajack/aicoding-book'
     # 用 GitHub Environment 做人工审批闸门（见 26.4）
     environment: production
     steps:

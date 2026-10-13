@@ -59,6 +59,12 @@ services → repositories → db
 
 demo 用请求头 `X-Demo-User: <email>` 模拟登录。**生产环境必须换成 OIDC/JWT 校验，这只是教学简化。** 测试用 `app.dependency_overrides` 注入用户。
 
+## 前端约定
+
+- 新组件先查 `frontend/src/features/` 里已有组件与设计系统，能复用就不新写。
+- 颜色只用 `frontend/src/tokens.css` 的语义令牌（`var(--color-*)`），组件与样式里不得硬编码色值；ESLint 规则会拦。
+- 提交前在 `frontend/` 下跑：`npm run lint`、`npx vitest run`、`npx tsc --noEmit`。
+
 ## 本地门禁命令（提交前自检）
 
 ```bash

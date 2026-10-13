@@ -2,7 +2,7 @@
 """从样例 git/PR/部署事件计算 DORA 四个关键指标，并对比"PR 数量"指标的误导性。
 
 所有事件数据均为【示意数据】，用于演示计算口径，不代表任何真实团队。
-DORA 四指标口径依据 Google Cloud DORA 官方定义（核验于 2026-10）。
+DORA 四指标口径依据 Google Cloud DORA 官方定义。
 """
 import statistics
 from datetime import datetime
