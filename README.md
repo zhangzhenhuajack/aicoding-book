@@ -1,6 +1,6 @@
 # aicoding-book
 
-《AI 编程实战：写出能上生产的代码》（Prompt → Context → Harness 三代方法 + FastAPI/React 完整项目）的随书仓库。书中写“随书仓库 teampulse-demo/<路径>”或“随书仓库 book-examples/…”时，均指本仓库根目录下的对应路径。
+《AI编程+工程方法：成功完成项目的全流程实践》（Prompt → Context → Harness → Loop 四代方法 + FastAPI/React 完整项目）的随书仓库。书中写“随书仓库 teampulse-demo/<路径>”或“随书仓库 book-examples/…”时，均指本仓库根目录下的对应路径。
 
 | 目录 / 文件 | 内容 |
 |---|---|
